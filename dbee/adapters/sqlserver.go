@@ -25,13 +25,13 @@ var _ core.Adapter = (*SQLServer)(nil)
 
 type SQLServer struct{}
 
-func (s *SQLServer) Connect(url string) (core.Driver, error) {
+func (s *SQLServer) ConnectWithDriverName(drivername string, url string) (core.Driver, error) {
 	u, err := nurl.Parse(url)
 	if err != nil {
 		return nil, fmt.Errorf("could not parse db connection string: %w: ", err)
 	}
 
-	db, err := sql.Open("sqlserver", u.String())
+	db, err := sql.Open(drivername, u.String())
 	if err != nil {
 		return nil, fmt.Errorf("unable to connect to sqlserver database: %v", err)
 	}
@@ -56,6 +56,10 @@ func (s *SQLServer) Connect(url string) (core.Driver, error) {
 		),
 		url: u,
 	}, nil
+}
+
+func (s *SQLServer) Connect(url string) (core.Driver, error) {
+	return s.ConnectWithDriverName("sqlserver", url)
 }
 
 func (*SQLServer) GetHelpers(opts *core.TableOptions) map[string]string {
